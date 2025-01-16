@@ -1,4 +1,4 @@
-package com.leboncoin.challenge.data.retrofit
+package com.leboncoin.challenge.data.network.retrofit
 
 import com.leboncoin.challenge.BuildConfig
 import okhttp3.Interceptor
