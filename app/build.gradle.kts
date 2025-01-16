@@ -21,6 +21,12 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildFeatures {
+            buildConfig = true
+        }
+
+        buildConfigField("String", "BASE_URL", "\"  https://static.leboncoin.fr/\"")
     }
 
     buildTypes {
@@ -73,6 +79,11 @@ dependencies {
     //Hilt
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+
+    //Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.logging.interceptor)
 }
 
 kapt {
