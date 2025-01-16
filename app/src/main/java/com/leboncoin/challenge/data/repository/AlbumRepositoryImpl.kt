@@ -10,7 +10,7 @@ class AlbumRepositoryImpl(private val albumService: AlbumService) : AlbumReposit
 
     override suspend fun getAlbums(): Result<List<Album>> {
         return try {
-            Result.Success(albumService.geAlbums().albums.map { it.toAlbum() })
+            Result.Success(albumService.geAlbums().map { it.toAlbum() })
         } catch (exception: Exception) {
             Result.Error(exception.toString())
         }
