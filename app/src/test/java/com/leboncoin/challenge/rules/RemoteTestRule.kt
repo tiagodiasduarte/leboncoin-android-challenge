@@ -1,6 +1,5 @@
 package com.leboncoin.challenge.rules
 
-import android.content.Context
 import androidx.annotation.VisibleForTesting
 import com.google.gson.Gson
 import com.leboncoin.challenge.util.readFromJSONToString
