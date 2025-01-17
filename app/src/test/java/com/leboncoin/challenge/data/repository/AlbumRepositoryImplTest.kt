@@ -3,12 +3,14 @@ package com.leboncoin.challenge.data.repository
 import com.google.common.truth.Truth.assertThat
 import com.leboncoin.challenge.core.Result
 import com.leboncoin.challenge.data.GET_ALBUMS_SUCCESS_RESPONSE
+import com.leboncoin.challenge.data.db.AlbumDao
 import com.leboncoin.challenge.data.network.model.NetworkAlbum
 import com.leboncoin.challenge.mapper.toAlbum
 import com.leboncoin.challenge.rules.RemoteTestRule
 import com.leboncoin.challenge.rules.toServerErrorResponse
 import com.leboncoin.challenge.rules.toServerSuccessResponse
 import com.leboncoin.challenge.util.readFromJSONToModel
+import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -24,7 +26,8 @@ class AlbumRepositoryImplTest {
     @Before
     fun setUp() {
         subject = AlbumRepositoryImpl(
-            albumService = remoteRule.createTestService()
+            albumService = remoteRule.createTestService(),
+            albumDao = mockk<AlbumDao>()
         )
     }
 
@@ -34,18 +37,18 @@ class AlbumRepositoryImplTest {
             readFromJSONToModel<List<NetworkAlbum>>(GET_ALBUMS_SUCCESS_RESPONSE).map { it.toAlbum() }
         remoteRule.toServerSuccessResponse(GET_ALBUMS_SUCCESS_RESPONSE)
 
-        val result = subject.getAlbums() as Result.Success
+        val result = subject.fetchAlbums() as Result.Success
         assertThat(result).isInstanceOf(Result.Success::class.java)
         assertThat(result.data).isEqualTo(expectedResult)
     }
 
     @Test
-    fun getAlbums_error_returnError() = runTest {
+    fun fetchAlbums_error_returnError() = runTest {
         val expectedResult =
             readFromJSONToModel<List<NetworkAlbum>>(GET_ALBUMS_SUCCESS_RESPONSE).map { it.toAlbum() }
         remoteRule.toServerErrorResponse(GET_ALBUMS_SUCCESS_RESPONSE)
 
-        val result = subject.getAlbums() as Result.Error
+        val result = subject.fetchAlbums() as Result.Error
         assertThat(result).isInstanceOf(Result.Error::class.java)
     }
 
