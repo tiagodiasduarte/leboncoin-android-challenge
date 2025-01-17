@@ -103,6 +103,8 @@ dependencies {
     testImplementation(libs.mockwebserver)
     testImplementation(libs.truth)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockk)
+    androidTestImplementation(libs.truth)
 }
 
 kapt {
