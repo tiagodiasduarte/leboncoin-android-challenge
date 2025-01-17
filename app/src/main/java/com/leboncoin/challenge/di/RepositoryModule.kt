@@ -1,5 +1,6 @@
 package com.leboncoin.challenge.di
 
+import com.leboncoin.challenge.data.db.AlbumDao
 import com.leboncoin.challenge.data.network.AlbumService
 import com.leboncoin.challenge.data.repository.AlbumRepositoryImpl
 import com.leboncoin.challenge.domain.repository.AlbumRepository
@@ -15,9 +16,10 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun providesAlbumRepository(albumService: AlbumService): AlbumRepository {
+    fun providesAlbumRepository(albumService: AlbumService, albumDao: AlbumDao): AlbumRepository {
         return AlbumRepositoryImpl(
-            albumService = albumService
+            albumService = albumService,
+            albumDao = albumDao
         )
     }
 
