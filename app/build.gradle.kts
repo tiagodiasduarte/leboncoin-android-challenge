@@ -28,7 +28,6 @@ android {
 
         buildConfigField("String", "BASE_URL", "\"  https://static.leboncoin.fr/\"")
     }
-
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -56,7 +55,6 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
-
     sourceSets {
         getByName("test") {
             resources.srcDirs("src/sharedTest/resources")
@@ -81,12 +79,16 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     //Hilt
+    implementation(libs.androidx.hilt.work)
+    implementation(libs.androidx.hilt.common)
+    kapt(libs.androidx.hilt.compiler)
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
 
     //Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.work.runtime.ktx)
     kapt(libs.androidx.room.compiler)
 
     //Retrofit
