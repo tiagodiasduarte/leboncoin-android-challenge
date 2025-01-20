@@ -15,7 +15,6 @@ import com.leboncoin.challenge.domain.error.ErrorEntity
 class FetchAlbumsUseCaseTest {
 
     private lateinit var subject: FetchAlbumsUseCase
-
     private val albumRepository = mockk<AlbumRepository>()
 
     @Before
@@ -26,7 +25,7 @@ class FetchAlbumsUseCaseTest {
     }
 
     @Test
-    fun success_returnNotes() = runTest {
+    fun success_returnAlbums() = runTest {
         val expectedResult = albumsStub()
         coEvery { albumRepository.fetchAlbums() } returns Result.Success(
             expectedResult

@@ -26,7 +26,7 @@ class ObserveAlbumsUseCaseTest {
     }
 
     @Test
-    fun success_returnNotes() = runTest {
+    fun success_returnAlbums() = runTest {
         val expectedResult = albumsStub()
         coEvery { albumRepository.getAlbums() } returns flowOf(expectedResult)
 
