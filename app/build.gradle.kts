@@ -85,6 +85,10 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
 
+    //Coil
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+
     //Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
