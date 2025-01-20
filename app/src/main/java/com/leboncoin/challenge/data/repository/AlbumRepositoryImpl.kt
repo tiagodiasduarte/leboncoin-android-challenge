@@ -19,7 +19,7 @@ class AlbumRepositoryImpl(
         return try {
             Result.Success(albumService.geAlbums().map { it.toAlbum() })
         } catch (exception: Exception) {
-            Result.Error(exception.toString())
+            Result.Error(exception.toErrorEntity())
         }
     }
 
