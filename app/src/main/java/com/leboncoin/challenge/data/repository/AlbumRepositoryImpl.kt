@@ -4,6 +4,7 @@ import com.leboncoin.challenge.data.network.AlbumService
 import com.leboncoin.challenge.domain.model.Album
 import com.leboncoin.challenge.core.Result
 import com.leboncoin.challenge.data.db.AlbumDao
+import com.leboncoin.challenge.data.network.extensions.toErrorEntity
 import com.leboncoin.challenge.domain.repository.AlbumRepository
 import com.leboncoin.challenge.mapper.toAlbum
 import com.leboncoin.challenge.mapper.toAlbums
@@ -17,7 +18,10 @@ class AlbumRepositoryImpl(
 
     override suspend fun fetchAlbums(): Result<List<Album>> {
         return try {
-            Result.Success(albumService.geAlbums().map { it.toAlbum() })
+            val networkAlbums = albumService.geAlbums().map { it.toAlbum() }
+            insertAlbums(networkAlbums)
+
+            Result.Success(networkAlbums)
         } catch (exception: Exception) {
             Result.Error(exception.toErrorEntity())
         }
