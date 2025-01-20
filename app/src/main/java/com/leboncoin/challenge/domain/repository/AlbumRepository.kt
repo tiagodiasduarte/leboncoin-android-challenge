@@ -8,7 +8,7 @@ interface AlbumRepository {
 
     suspend fun fetchAlbums(): Result<List<Album>>
 
-    suspend fun getAlbums(): Flow<List<Album>>
+    fun getAlbums(): Flow<List<Album>>
 
     suspend fun insertAlbums(albums: List<Album>): List<Long>
 

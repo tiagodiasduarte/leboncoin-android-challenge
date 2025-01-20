@@ -19,20 +19,24 @@ class AlbumRepositoryImpl(
     override suspend fun fetchAlbums(): Result<List<Album>> {
         return try {
             val networkAlbums = albumService.geAlbums().map { it.toAlbum() }
-            insertAlbums(networkAlbums)
+
+            if (networkAlbums.isNotEmpty()) {
+                insertAlbums(networkAlbums)
+            }
 
             Result.Success(networkAlbums)
+
         } catch (exception: Exception) {
             Result.Error(exception.toErrorEntity())
         }
     }
 
-    override suspend fun getAlbums(): Flow<List<Album>> {
+    override fun getAlbums(): Flow<List<Album>> {
         return albumDao.getAlbums().toAlbums()
     }
 
     override suspend fun insertAlbums(albums: List<Album>): List<Long> {
-       return albumDao.insertAlbums(albums.map { it.toEntity() })
+        return albumDao.insertAlbums(albums.map { it.toEntity() })
     }
 
 }
