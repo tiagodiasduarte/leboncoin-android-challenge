@@ -20,9 +20,7 @@ class AlbumsViewModel @Inject constructor(
 
         when (result) {
             is Result.Success -> {
-                AlbumsUiState.Success(
-                    albums = result.data
-                )
+                AlbumsUiState.Success(result.data)
             }
             is Result.Error -> {
                 AlbumsUiState.Error(ErrorEntity.Unknown.toString())
