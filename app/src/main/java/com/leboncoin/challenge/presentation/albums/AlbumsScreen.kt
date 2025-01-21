@@ -21,12 +21,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.leboncoin.challenge.R
 import com.leboncoin.challenge.domain.model.Album
 import com.leboncoin.challenge.ui.theme.DevicePreviews
+import com.leboncoin.challenge.util.TestTags.ALBUMS_SCREEN_LIST
+import com.leboncoin.challenge.util.TestTags.ALBUMS_SCREEN_LOADING_CONTENT
+import com.leboncoin.challenge.util.TestTags.ALBUMS_SCREEN_PROGRESS_WHEEL
 
 @Composable
 fun AlbumsRoute(
@@ -53,9 +57,11 @@ fun AlbumsScreen(uiState: AlbumsUiState) {
             when (uiState) {
                 is AlbumsUiState.Error -> {
                 }
+
                 is AlbumsUiState.Loading -> {
                     LoadingContent()
                 }
+
                 is AlbumsUiState.Success -> {
                     //Take 20 temporary to better performance
                     AlbumListScreen(albums = uiState.albums.take(20))
@@ -72,9 +78,12 @@ fun AlbumsTopAppBar() {
 
 @Composable
 fun AlbumListScreen(albums: List<Album>) {
-    LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 150.dp)) {
+    LazyVerticalGrid(
+        modifier = Modifier.testTag(ALBUMS_SCREEN_LIST),
+        columns = GridCells.Adaptive(minSize = 150.dp)
+    ) {
         items(albums) { album ->
-            AlbumItem(album = album)
+            AlbumItem(album)
         }
     }
 }
@@ -83,12 +92,14 @@ fun AlbumListScreen(albums: List<Album>) {
 fun LoadingContent() {
     Box(
         modifier = Modifier
+            .testTag(ALBUMS_SCREEN_LOADING_CONTENT)
             .fillMaxSize()
             .background(Color.Black.copy(alpha = 0.5f))
             .clickable(enabled = false) {}
     ) {
         CircularProgressIndicator(
             modifier = Modifier
+                .testTag(ALBUMS_SCREEN_PROGRESS_WHEEL)
                 .align(Alignment.Center)
         )
     }
@@ -129,7 +140,6 @@ fun AlbumsScreenPreview() {
 fun AlbumsScreenLoadingPreview() {
     AlbumsScreen(AlbumsUiState.Loading)
 }
-
 
 @DevicePreviews
 @Composable
