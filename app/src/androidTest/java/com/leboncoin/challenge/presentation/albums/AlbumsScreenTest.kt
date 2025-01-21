@@ -3,10 +3,9 @@ package com.leboncoin.challenge.presentation.albums
 import android.content.Context
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
-import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.leboncoin.challenge.R
@@ -30,12 +29,16 @@ class AlbumsScreenTest {
 
         // Show title text
         val expectedString = context.getString(R.string.albums_text)
-        composeRule.onNodeWithContentDescription(expectedString).isDisplayed()
+        composeRule.onNodeWithText(expectedString).assertIsDisplayed()
     }
 
     @Test
     fun uiStateLoading_showLoadingContent() {
         setupAlbumsScreen(AlbumsUiState.Loading)
+
+        // Show loading content
+        composeRule.onNodeWithTag(TestTags.ALBUMS_SCREEN_LOADING_CONTENT).assertIsDisplayed()
+        composeRule.onNodeWithTag(TestTags.ALBUMS_SCREEN_PROGRESS_WHEEL).assertIsDisplayed()
     }
 
     @Test
