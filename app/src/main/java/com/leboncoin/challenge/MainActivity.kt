@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.work.WorkManager
+import com.leboncoin.challenge.presentation.albums.AlbumsRoute
 import com.leboncoin.challenge.ui.theme.ChallengeTheme
 import com.leboncoin.challenge.worker.initializer.FetchAlbums
 import dagger.hilt.android.AndroidEntryPoint
@@ -17,6 +18,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ChallengeTheme {
+                AlbumsRoute()
             }
         }
 

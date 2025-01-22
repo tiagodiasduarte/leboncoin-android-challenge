@@ -85,6 +85,13 @@ dependencies {
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
 
+    //Coil
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+
+    //Navigation
+    implementation(libs.androidx.hilt.navigation.compose)
+
     //Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
@@ -102,6 +109,7 @@ dependencies {
     testImplementation(libs.truth)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
 
     //Instrumentation tests
     androidTestImplementation(libs.androidx.junit)

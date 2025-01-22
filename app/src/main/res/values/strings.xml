@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">Challenge</string>
+    <string name="app_name">Leboncoin</string>
+    <string name="albums_text">Albums</string>
+    <string name="albums_image_content_description">Albums</string>
 </resources>
