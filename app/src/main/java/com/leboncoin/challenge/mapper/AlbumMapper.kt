@@ -1,5 +1,7 @@
 package com.leboncoin.challenge.mapper
 
+import androidx.paging.PagingData
+import androidx.paging.map
 import com.leboncoin.challenge.data.db.model.AlbumEntity
 import com.leboncoin.challenge.data.network.model.NetworkAlbum
 import com.leboncoin.challenge.domain.model.Album
@@ -44,3 +46,12 @@ fun AlbumEntity.toAlbum(): Album =
 
 fun Flow<List<AlbumEntity>>.toAlbums(): Flow<List<Album>> =
     this.map { albumEntities -> albumEntities.map { it.toAlbum() } }
+
+@JvmName("FlowPagingDataAlbumEntityToPagingDataAlbum")
+fun Flow<PagingData<AlbumEntity>>.toAlbums(): Flow<PagingData<Album>> =
+    this.map { albumEntities -> albumEntities.map { it.toAlbum() } }
+
+@JvmName("PagingDataAlbumEntityToPagingDataAlbum")
+fun PagingData<AlbumEntity>.toAlbums(): PagingData<Album> =
+    this.map { albumEntity -> albumEntity.toAlbum()}
+

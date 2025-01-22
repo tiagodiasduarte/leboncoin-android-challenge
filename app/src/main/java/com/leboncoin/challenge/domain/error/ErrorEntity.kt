@@ -16,5 +16,7 @@ sealed interface ErrorEntity  {
         DISK_FULL
     }
 
-    data object Unknown : ErrorEntity
+    data class IllegalArgument(val message: String) : ErrorEntity
+
+    data class Unknown(val message: String)  : ErrorEntity
 }

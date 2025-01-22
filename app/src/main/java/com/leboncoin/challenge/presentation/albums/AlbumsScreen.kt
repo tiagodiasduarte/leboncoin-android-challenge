@@ -9,62 +9,71 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.LoadState
+import androidx.paging.LoadStates
+import androidx.paging.PagingData
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.leboncoin.challenge.R
 import com.leboncoin.challenge.domain.model.Album
 import com.leboncoin.challenge.ui.theme.DevicePreviews
+import com.leboncoin.challenge.ui.theme.Dimensions
 import com.leboncoin.challenge.util.TestTags.ALBUMS_SCREEN_LIST
+import com.leboncoin.challenge.util.TestTags.ALBUMS_SCREEN_LIST_EMPTY_TEXT
 import com.leboncoin.challenge.util.TestTags.ALBUMS_SCREEN_LOADING_CONTENT
 import com.leboncoin.challenge.util.TestTags.ALBUMS_SCREEN_PROGRESS_WHEEL
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun AlbumsRoute(
     viewModel: AlbumsViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
 
-    AlbumsScreen(uiState)
+    val moviePagingItems = viewModel.albumsState.collectAsLazyPagingItems()
+
+    AlbumsScreen(moviePagingItems)
 }
 
 @Composable
-fun AlbumsScreen(uiState: AlbumsUiState) {
+fun AlbumsScreen(albumsPaging: LazyPagingItems<Album>) {
+
     Scaffold(
-        topBar = { AlbumsTopAppBar() }
-
+        topBar = { AlbumsTopAppBar() },
+        containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-
-            when (uiState) {
-                is AlbumsUiState.Error -> {
+            when (albumsPaging.loadState.refresh) {
+                is LoadState.Error -> {
                 }
 
-                is AlbumsUiState.Loading -> {
+                is LoadState.Loading -> {
                     LoadingContent()
                 }
 
-                is AlbumsUiState.Success -> {
-                    //Take 20 temporary to better performance
-                    AlbumListScreen(albums = uiState.albums.take(20))
+                is LoadState.NotLoading -> {
+                    if (albumsPaging.itemCount > 0) {
+                        AlbumListScreen(albumsPaging)
+                    } else {
+                        EmptyListContent(modifier = Modifier.align(Alignment.Center))
+                    }
                 }
             }
         }
@@ -73,17 +82,41 @@ fun AlbumsScreen(uiState: AlbumsUiState) {
 
 @Composable
 fun AlbumsTopAppBar() {
-    TopAppBar(title = { Text(text = stringResource(id = R.string.albums_text)) })
+    TopAppBar(
+        title = {
+            Text(
+                text = stringResource(id = R.string.albums_text),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+        },
+        colors = topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background
+        )
+    )
 }
 
 @Composable
-fun AlbumListScreen(albums: List<Album>) {
+fun AlbumListScreen(albumsPaging: LazyPagingItems<Album>) {
     LazyVerticalGrid(
         modifier = Modifier.testTag(ALBUMS_SCREEN_LIST),
-        columns = GridCells.Adaptive(minSize = 150.dp)
+        columns = GridCells.Adaptive(minSize = Dimensions.AlbumItemWidth)
     ) {
-        items(albums) { album ->
-            AlbumItem(album)
+        items(albumsPaging.itemCount) { index ->
+            AlbumItem(albumsPaging[index]!!)
+        }
+    }
+
+    albumsPaging.apply {
+        when {
+            loadState.refresh is LoadState.Loading -> {
+            }
+
+            loadState.refresh is LoadState.Error -> {
+            }
+
+            loadState.append is LoadState.Error -> {
+            }
         }
     }
 }
@@ -103,6 +136,14 @@ fun LoadingContent() {
                 .align(Alignment.Center)
         )
     }
+}
+
+@Composable
+fun EmptyListContent(modifier: Modifier) {
+    Text(
+        modifier = modifier.testTag(ALBUMS_SCREEN_LIST_EMPTY_TEXT),
+        text = stringResource(id = R.string.albums_list_empty_text)
+    )
 }
 
 @DevicePreviews
@@ -132,18 +173,35 @@ fun AlbumsScreenPreview() {
         )
     )
 
-    AlbumsScreen(AlbumsUiState.Success(albums = albums))
+    val albumsPagingStateFlow = MutableStateFlow(PagingData.from(albums))
+    AlbumsScreen(albumsPagingStateFlow.collectAsLazyPagingItems())
 }
 
 @DevicePreviews
 @Composable
 fun AlbumsScreenLoadingPreview() {
-    AlbumsScreen(AlbumsUiState.Loading)
+    val albumsPaging = PagingData.from(
+        data = emptyList<Album>(),
+        sourceLoadStates = LoadStates(
+            refresh = LoadState.Loading,
+            prepend = LoadState.Loading,
+            append = LoadState.Loading,
+        )
+    )
+    AlbumsScreen(MutableStateFlow(albumsPaging).collectAsLazyPagingItems())
 }
 
 @DevicePreviews
 @Composable
 fun AlbumsScreenErrorPreview() {
-    AlbumsScreen(AlbumsUiState.Error("Something went wrong"))
+    val albumsPaging = PagingData.from(
+        data = emptyList<Album>(),
+        sourceLoadStates = LoadStates(
+            refresh = LoadState.Error(Throwable("Something went wrong")),
+            prepend = LoadState.Loading,
+            append = LoadState.Loading,
+        )
+    )
+    AlbumsScreen(MutableStateFlow(albumsPaging).collectAsLazyPagingItems())
 }
 
