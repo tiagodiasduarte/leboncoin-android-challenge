@@ -66,7 +66,7 @@ android {
 }
 
 dependencies {
-
+    //Androidx
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -77,28 +77,21 @@ dependencies {
     implementation(libs.androidx.material3)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
-    //Hilt
     implementation(libs.androidx.hilt.work)
     implementation(libs.androidx.hilt.common)
     kapt(libs.androidx.hilt.compiler)
-    implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
-
-    //Coil
-    implementation(libs.coil.compose)
-    implementation(libs.coil.network.okhttp)
-
-    //Navigation
     implementation(libs.androidx.hilt.navigation.compose)
-
-    //Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.room.paging)
     kapt(libs.androidx.room.compiler)
-
-    //Retrofit
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
@@ -110,6 +103,7 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockk)
     testImplementation(libs.turbine)
+    testImplementation(libs.androidx.paging.testing)
 
     //Instrumentation tests
     androidTestImplementation(libs.androidx.junit)
