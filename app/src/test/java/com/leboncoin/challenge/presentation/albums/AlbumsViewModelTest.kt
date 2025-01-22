@@ -1,15 +1,19 @@
 package com.leboncoin.challenge.presentation.albums
 
+import androidx.paging.PagingData
+import androidx.paging.testing.asSnapshot
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.leboncoin.challenge.data.albumsStub
-import com.leboncoin.challenge.domain.error.ErrorEntity
+import com.leboncoin.challenge.core.Result
+import com.leboncoin.challenge.domain.model.Album
 import com.leboncoin.challenge.domain.use_case.ObserveAlbumsUseCase
 import com.leboncoin.challenge.rules.MainDispatcherRule
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
@@ -19,58 +23,32 @@ class AlbumsViewModelTest {
     @get:Rule
     val dispatcherRule = MainDispatcherRule()
 
-    private lateinit var viewModel: AlbumsViewModel
+    private lateinit var subject: AlbumsViewModel
     private val observeAlbumsUseCase = mockk<ObserveAlbumsUseCase>(relaxed = true)
 
-    @Test
-    fun uiState_starting_returnLoading() {
-        viewModel = AlbumsViewModel(observeAlbumsUseCase)
-
-        assertThat(viewModel.uiState.value).isInstanceOf(AlbumsUiState.Loading::class.java)
-    }
 
     @Test
-    fun observeAlbums_success_returnAlbums() = runTest {
+    fun observeAlbums_whenSuccess_thenReturnAlbums() = runTest {
         val expectedResult = albumsStub()
 
-        every { observeAlbumsUseCase() } returns flow {
-            emit(com.leboncoin.challenge.core.Result.Success(expectedResult))
+        every { observeAlbumsUseCase(any()) } returns flow {
+            emit(Result.Success(PagingData.from(expectedResult)))
         }
 
-        viewModel = AlbumsViewModel(observeAlbumsUseCase)
+        subject = AlbumsViewModel(observeAlbumsUseCase)
 
-        viewModel.uiState.test {
+        subject.albumsState.test {
+            awaitItem()
 
-            awaitItem() as AlbumsUiState.Loading
+            val items = flowOf(awaitItem())
+            val albumsSnapshot: List<Album> = items.asSnapshot()
 
-            val successState = awaitItem() as AlbumsUiState.Success
-            assertThat(successState.albums.size).isEqualTo(expectedResult.size)
+            assertThat(albumsSnapshot.size).isEqualTo(expectedResult.size)
 
             cancelAndIgnoreRemainingEvents()
         }
 
-        verify { observeAlbumsUseCase() }
-    }
-
-    @Test
-    fun observeAlbums_error_returnError() = runTest {
-        val error = ErrorEntity.Unknown
-        every { observeAlbumsUseCase() } returns flow {
-            emit(com.leboncoin.challenge.core.Result.Error(error))
-        }
-
-        viewModel = AlbumsViewModel(observeAlbumsUseCase)
-
-        viewModel.uiState.test {
-            awaitItem() as AlbumsUiState.Loading
-
-            val errorState = awaitItem() as AlbumsUiState.Error
-            assertThat(errorState.error).isEqualTo(error.toString())
-
-            cancelAndIgnoreRemainingEvents()
-        }
-
-        verify { observeAlbumsUseCase() }
+        verify { observeAlbumsUseCase(any()) }
     }
 
 }
