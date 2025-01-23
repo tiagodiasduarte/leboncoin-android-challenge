@@ -8,6 +8,7 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.leboncoin.challenge.core.Result
 import com.leboncoin.challenge.domain.model.Album
+import com.leboncoin.challenge.domain.use_case.FetchAlbumsUseCase
 import com.leboncoin.challenge.domain.use_case.ObserveAlbumsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -23,6 +24,7 @@ private const val PAGE_SIZE = 20
 @HiltViewModel
 class AlbumsViewModel @Inject constructor(
     private val observeAlbumsUseCase: ObserveAlbumsUseCase,
+    private val fetchAlbumsUseCase: FetchAlbumsUseCase,
 ) : ViewModel() {
 
     private val _albumsState = MutableStateFlow<PagingData<Album>>(PagingData.empty())
@@ -30,6 +32,7 @@ class AlbumsViewModel @Inject constructor(
 
     init {
         getAlbums()
+        fetchAlbums()
     }
 
     private fun getAlbums() {
@@ -48,6 +51,23 @@ class AlbumsViewModel @Inject constructor(
                 .cachedIn(viewModelScope)
                 .collect {
                     _albumsState.value = it
+                }
+        }
+    }
+
+    private fun fetchAlbums() {
+        viewModelScope.launch {
+            fetchAlbumsUseCase.invoke()
+                .collect { result ->
+                    when (result) {
+                        is Result.Error -> {
+                            Log.d("AlbumsViewModel","Something went wrong while loading the albums")
+                        }
+
+                        is Result.Success -> {
+                            Log.d("AlbumsViewModel","Albums loaded successfully!")
+                        }
+                    }
                 }
         }
     }
