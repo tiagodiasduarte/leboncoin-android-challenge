@@ -61,10 +61,11 @@ class AlbumsViewModel @Inject constructor(
                 .collect { result ->
                     when (result) {
                         is Result.Error -> {
+                            Log.d("AlbumsViewModel","Something went wrong while loading the albums")
                         }
 
                         is Result.Success -> {
-
+                            Log.d("AlbumsViewModel","Albums loaded successfully!")
                         }
                     }
                 }
