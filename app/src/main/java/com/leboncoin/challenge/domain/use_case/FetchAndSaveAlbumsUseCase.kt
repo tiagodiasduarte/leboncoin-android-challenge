@@ -7,11 +7,22 @@ import com.leboncoin.challenge.domain.repository.AlbumRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class FetchAlbumsUseCase(private val repository: AlbumRepository) {
+class FetchAndSaveAlbumsUseCase(private val repository: AlbumRepository) {
 
     operator fun invoke(): Flow<Result<List<Album>>> = flow {
         try {
-            emit(repository.fetchAlbums())
+            when (val result = repository.fetchAlbums()) {
+                is Result.Error -> {
+                    emit(Result.Error(ErrorEntity.Unknown))
+                }
+                is Result.Success -> {
+                    if (result.data.isNotEmpty()) {
+                        repository.saveAlbums(result.data)
+                    }
+
+                    emit(Result.Success(result.data))
+                }
+            }
 
         } catch (e: Exception) {
             emit(Result.Error(ErrorEntity.Unknown))

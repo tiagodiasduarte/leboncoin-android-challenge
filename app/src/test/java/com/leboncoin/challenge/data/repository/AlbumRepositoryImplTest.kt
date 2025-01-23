@@ -36,26 +36,38 @@ class AlbumRepositoryImplTest {
     }
 
     @Test
-    fun getAlbums_success_returnAlbums() = runTest {
+    fun fetchAlbums_whenSuccess_thenReturnSuccess() = runTest {
         val expectedResult =
             readFromJSONToModel<List<NetworkAlbum>>(GET_ALBUMS_SUCCESS_RESPONSE).map { it.toAlbum() }
         remoteRule.toServerSuccessResponse(GET_ALBUMS_SUCCESS_RESPONSE)
 
-        coEvery { albumDao.insertAlbums(any()) } returns expectedResult.map { it.id.toLong() }
-
         val result = subject.fetchAlbums() as Result.Success
+
         assertThat(result).isInstanceOf(Result.Success::class.java)
         assertThat(result.data).isEqualTo(expectedResult)
-
-        coVerify { albumDao.insertAlbums(any()) }
     }
 
     @Test
-    fun fetchAlbums_error_returnError() = runTest {
+    fun fetchAlbums_whenError_ThenReturnError() = runTest {
         remoteRule.toServerErrorResponse(GET_ALBUMS_ERROR_RESPONSE)
 
         val result = subject.fetchAlbums() as Result.Error
         assertThat(result).isInstanceOf(Result.Error::class.java)
+    }
+
+    @Test
+    fun saveAlbums_whenSuccess_thenReturnSuccess() = runTest {
+        val expectedResult =
+            readFromJSONToModel<List<NetworkAlbum>>(GET_ALBUMS_SUCCESS_RESPONSE).map { it.toAlbum() }
+        remoteRule.toServerSuccessResponse(GET_ALBUMS_SUCCESS_RESPONSE)
+
+        val ids = expectedResult.map { it.id.toLong() }
+        coEvery { albumDao.insertAlbums(any()) } returns ids
+
+        val result = subject.saveAlbums(expectedResult)
+        assertThat(result).isEqualTo(ids)
+
+        coVerify { albumDao.insertAlbums(any()) }
     }
 
 }

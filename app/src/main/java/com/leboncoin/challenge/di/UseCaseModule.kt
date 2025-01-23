@@ -1,7 +1,7 @@
 package com.leboncoin.challenge.di
 
 import com.leboncoin.challenge.domain.repository.AlbumRepository
-import com.leboncoin.challenge.domain.use_case.FetchAlbumsUseCase
+import com.leboncoin.challenge.domain.use_case.FetchAndSaveAlbumsUseCase
 import com.leboncoin.challenge.domain.use_case.ObserveAlbumsUseCase
 import dagger.Module
 import dagger.Provides
@@ -15,10 +15,10 @@ object UseCaseModule {
 
     @Provides
     @Singleton
-    fun providesFetchAlbumsUseCases(
+    fun providesFetchAndSaveAlbumsUseCases(
         albumRepository: AlbumRepository,
-    ): FetchAlbumsUseCase {
-        return FetchAlbumsUseCase(albumRepository)
+    ): FetchAndSaveAlbumsUseCase {
+        return FetchAndSaveAlbumsUseCase(albumRepository)
     }
 
     @Provides
