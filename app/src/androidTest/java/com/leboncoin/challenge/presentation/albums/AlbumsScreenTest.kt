@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import androidx.paging.LoadState
 import androidx.paging.LoadStates
 import androidx.paging.PagingData
@@ -51,15 +52,10 @@ class AlbumsScreenTest {
 
     @Test
     fun albumsPaging_whenRefreshLoadStateNotLoading_withAlbums_thenShowAlbums() {
-        val sourceLoadStates = LoadStates(
-            refresh = LoadState.NotLoading(false),
-            prepend = LoadState.Loading,
-            append = LoadState.Loading,
-        )
 
         setupAlbumsScreen(
-            albums = albumsStub(),
-            sourceLoadStates = sourceLoadStates
+            refreshLoadState = LoadState.NotLoading(false),
+            albums = albumsStub()
         )
 
         // Show albums screen list
@@ -78,7 +74,7 @@ class AlbumsScreenTest {
             append = LoadState.Loading,
         )
 
-        setupAlbumsScreen(sourceLoadStates = sourceLoadStates)
+        setupAlbumsScreen(refreshLoadState = LoadState.NotLoading(false))
 
         // Show empty list text
         composeRule.onNodeWithTag(TestTags.ALBUMS_SCREEN_LIST_EMPTY_TEXT).assertIsDisplayed()
@@ -96,13 +92,8 @@ class AlbumsScreenTest {
         val dialogTitle = context.getString(R.string.albums_list_dialog_error_title)
         val error = "Something went wrong"
 
-        val sourceLoadStates = LoadStates(
-            refresh = LoadState.NotLoading(false),
-            prepend = LoadState.Loading,
-            append = LoadState.Loading,
-        )
         setupAlbumsScreen(
-            sourceLoadStates = sourceLoadStates,
+            refreshLoadState = LoadState.NotLoading(false),
             errorMessage = error
         )
 
@@ -113,19 +104,33 @@ class AlbumsScreenTest {
             .assertIsDisplayed()
     }
 
+    @Test
+    fun clickOnDialogRetryButton() {
+        val error = "Something went wrong"
+
+        setupAlbumsScreen(
+            refreshLoadState = LoadState.NotLoading(false),
+            errorMessage = error
+        )
+
+        composeRule.onNodeWithText(context.getString(R.string.albums_list_dialog_error_retry_button))
+            .assertIsDisplayed()
+            .performClick()
+    }
+
     private fun setupAlbumsScreen(
         albums: List<Album> = emptyList(),
-        sourceLoadStates: LoadStates = LoadStates(
-            refresh = LoadState.Loading,
-            prepend = LoadState.Loading,
-            append = LoadState.Loading,
-        ),
+        refreshLoadState: LoadState = LoadState.Loading,
         errorMessage: String? = null
     ) = runTest {
 
         val paging = PagingData.from(
             data = albums,
-            sourceLoadStates = sourceLoadStates
+            sourceLoadStates = LoadStates(
+                refresh = refreshLoadState,
+                prepend = LoadState.Loading,
+                append = LoadState.Loading,
+            )
         )
 
         composeRule.setContent {
@@ -133,7 +138,7 @@ class AlbumsScreenTest {
             AlbumsScreen(
                 albumsPaging = lazyAlbumsPaging,
                 onEventAction = { },
-                errorUiText =  errorMessage?.let { UiText.DynamicString(it) }
+                errorUiText = errorMessage?.let { UiText.DynamicString(it) }
             )
         }
     }

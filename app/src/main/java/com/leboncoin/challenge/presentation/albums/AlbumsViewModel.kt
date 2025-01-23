@@ -2,17 +2,16 @@
 
 package com.leboncoin.challenge.presentation.albums
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.leboncoin.challenge.presentation.UiText
-import com.leboncoin.challenge.presentation.asUiText
 import com.leboncoin.challenge.core.Result
 import com.leboncoin.challenge.domain.model.Album
 import com.leboncoin.challenge.domain.use_case.FetchAndSaveAlbumsUseCase
 import com.leboncoin.challenge.domain.use_case.ObserveAlbumsUseCase
+import com.leboncoin.challenge.presentation.UiText
+import com.leboncoin.challenge.presentation.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +22,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 private const val PAGE_SIZE = 20
-private const val ALBUMS_VIEW_MODEL_TAG = "AlbumsViewModel"
 
 @HiltViewModel
 class AlbumsViewModel @Inject constructor(
@@ -37,6 +35,9 @@ class AlbumsViewModel @Inject constructor(
     private val _albumsState = MutableStateFlow<PagingData<Album>>(PagingData.empty())
     val albumsState = _albumsState.asStateFlow()
 
+    private val _albumsLoaded = MutableStateFlow(false)
+    val albumsLoaded = _albumsLoaded.asStateFlow()
+
     init {
         getAlbums()
         fetchAlbums()
@@ -44,7 +45,7 @@ class AlbumsViewModel @Inject constructor(
 
     fun onEvent(event: AlbumsEvent) {
         when (event) {
-            AlbumsEvent.Retry -> {
+            AlbumsEvent.FetchAlbums -> {
                 fetchAlbums()
             }
 
@@ -80,11 +81,11 @@ class AlbumsViewModel @Inject constructor(
                 .collect { result ->
                     when (result) {
                         is Result.Error -> {
+                            _albumsLoaded.value = true
                             _errorUiText.value = result.error.asUiText()
                         }
-
                         is Result.Success -> {
-                            Log.d(ALBUMS_VIEW_MODEL_TAG,"Albums loaded successfully!")
+                            _albumsLoaded.value = true
                         }
                     }
                 }
