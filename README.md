@@ -46,7 +46,7 @@ The tasks for this project are detailed in the associated Pull Request.
 - [[LAC-6] Paging 3 integration](https://github.com/tiagodiasduarte/leboncoin-android-challenge/pull/6)
 - [[LAC-7] Fetch albums from ViewModel](https://github.com/tiagodiasduarte/leboncoin-android-challenge/pull/7)
 - [[LAC-8] Add Error Dialog to AlbumsScreen](https://github.com/tiagodiasduarte/leboncoin-android-challenge/pull/8)
-- [[LAC-9] Rename FetchAlbumsUseCase ](https://github.com/tiagodiasduarte/leboncoin-android-challenge/pull/9)
+- [[LAC-9] Rename FetchAlbumsUseCase](https://github.com/tiagodiasduarte/leboncoin-android-challenge/pull/9)
 
 ## 📝 Choices made
 
