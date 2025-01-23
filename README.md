@@ -2,6 +2,7 @@
 The project follows Clean Architecture with the MVVM presentation pattern, utilizing Kotlin Coroutines and Flow for asynchronous operations. Hilt is used for dependency injection, ensuring that all dependencies are correctly provided at runtime.
 UI tests are implemented to validate user interactions and visual elements, while unit tests cover the domain and presentation layers to ensure business logic correctness.
 
+
 ## 📄 Description
 A Simple Android application that fetchs and display a list of albums from an given endpoint via the provided API in JSON format. Must be implement a data persistence system so that the data can be available offline, even after restarting the application.
 
@@ -13,12 +14,10 @@ A Simple Android application that fetchs and display a list of albums from an gi
 - **Albums Screen**: Displays a list of album items with a title and image from the Leboncoin API.
 - **Offline Support**: Albums are persisted in a local database to ensure availability offline.
 
-## 📸 Screenshots
 
+## 📸 Screenshots
 <img src="https://github.com/user-attachments/assets/630dfca0-3199-4698-99e6-9b83ce347914" alt="Description" width="900">
 
-## 📦 APK
-Download the APK directly [here](https://github.com/tiagodiasduarte/) to test the application immediately.
 
 ## 📚 Libraries
 - [Kotlin](https://kotlinlang.org/)
@@ -29,11 +28,13 @@ Download the APK directly [here](https://github.com/tiagodiasduarte/) to test th
 - [Hilt](https://developer.android.com/training/dependency-injection/hilt-android)
 - [Coil](https://coil-kt.github.io/coil/)
 
+
 ## 🧪 Testing Libraries
 - [Junit4](https://junit.org/junit4/)
 - [Truth](https://truth.dev/)
 - [Mockk](https://mockk.io/)
 - [Turbine](https://github.com/cashapp/turbine)
+
 
 ## ✅ Tasks
 The tasks for this project are detailed in the associated Pull Request.
@@ -48,6 +49,7 @@ The tasks for this project are detailed in the associated Pull Request.
 - [[LAC-8] Add Error Dialog to AlbumsScreen](https://github.com/tiagodiasduarte/leboncoin-android-challenge/pull/8)
 - [[LAC-9] Rename FetchAlbumsUseCase](https://github.com/tiagodiasduarte/leboncoin-android-challenge/pull/9)
 
+
 ## 📝 Choices made
 
 #### Clean Architecture
@@ -56,7 +58,6 @@ The app follows the Clean Architecture layers:
 - **Data Layer:** Handles data operations, including network communication and local storage (Room database).
 - **Domain Layer:** Contains business logic and use cases, which can be easily reused or extended.
 - **Presentation Layer (UI):** Built with the MVVM (Model-View-ViewModel) pattern, the ViewModel interacts with the domain layer to retrieve data and update the UI.
-
 
 #### MVVM (Model-View-ViewModel)
 MVVM was chosen for the presentation layer to separate the UI logic from the business logic and make the UI more declarative and testable with Jetpack Compose. MVVM helps in handling the UI state efficiently, especially when dealing with data changes and user interactions.
@@ -83,6 +84,7 @@ Testing Libraries:
 
 ## ⚠️ Known issues
 1. **Placeholder Image Not Available:** The placeholder images used in the app (from via.placeholder.com) are currently unavailable.
+
 
 ## 🔮 Future Improvements
 1. **Modularization**: Introduce modularization to improve scalability, maintainability, and team collaboration. By separating the app into feature-specific and shared modules (e.g., Core, Feature, Data), we can enhance build times, enable code reuse, and ensure a cleaner architecture. This approach will simplify scaling and streamline development.
