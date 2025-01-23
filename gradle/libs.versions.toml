@@ -5,7 +5,6 @@ coil = "3.0.4"
 coreKtx = "1.15.0"
 converterGson = "2.9.0"
 composeBom = "2024.04.01"
-espressoCore = "3.6.1"
 hiltAndroid = "2.51.1"
 hilt = "1.2.0"
 kotlin = "1.9.0"
@@ -27,7 +26,6 @@ workRuntimeKtx = "2.10.0"
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hilt" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }

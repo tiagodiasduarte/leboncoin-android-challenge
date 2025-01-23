@@ -11,6 +11,6 @@ interface AlbumRepository {
 
     fun getAlbums(pageSize: Int): Flow<PagingData<Album>>
 
-    suspend fun insertAlbums(albums: List<Album>): List<Long>
+    suspend fun saveAlbums(albums: List<Album>): List<Long>
 
 }

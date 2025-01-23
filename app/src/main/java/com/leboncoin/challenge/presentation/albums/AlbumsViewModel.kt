@@ -11,7 +11,7 @@ import com.leboncoin.challenge.presentation.UiText
 import com.leboncoin.challenge.presentation.asUiText
 import com.leboncoin.challenge.core.Result
 import com.leboncoin.challenge.domain.model.Album
-import com.leboncoin.challenge.domain.use_case.FetchAlbumsUseCase
+import com.leboncoin.challenge.domain.use_case.FetchAndSaveAlbumsUseCase
 import com.leboncoin.challenge.domain.use_case.ObserveAlbumsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -28,7 +28,7 @@ private const val ALBUMS_VIEW_MODEL_TAG = "AlbumsViewModel"
 @HiltViewModel
 class AlbumsViewModel @Inject constructor(
     private val observeAlbumsUseCase: ObserveAlbumsUseCase,
-    private val fetchAlbumsUseCase: FetchAlbumsUseCase,
+    private val fetchAndSaveAlbumsUseCase: FetchAndSaveAlbumsUseCase,
 ) : ViewModel() {
 
     private val _errorUiText = MutableStateFlow<UiText?>(null)
@@ -76,7 +76,7 @@ class AlbumsViewModel @Inject constructor(
 
     private fun fetchAlbums() {
         viewModelScope.launch {
-            fetchAlbumsUseCase.invoke()
+            fetchAndSaveAlbumsUseCase.invoke()
                 .collect { result ->
                     when (result) {
                         is Result.Error -> {

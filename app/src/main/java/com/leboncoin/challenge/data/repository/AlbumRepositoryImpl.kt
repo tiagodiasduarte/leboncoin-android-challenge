@@ -27,10 +27,6 @@ class AlbumRepositoryImpl(
         return try {
             val networkAlbums = albumService.geAlbums().map { it.toAlbum() }
 
-            if (networkAlbums.isNotEmpty()) {
-                insertAlbums(networkAlbums)
-            }
-
             Result.Success(networkAlbums)
 
         } catch (exception: Exception) {
@@ -50,7 +46,7 @@ class AlbumRepositoryImpl(
         }
     }
 
-    override suspend fun insertAlbums(albums: List<Album>): List<Long> {
+    override suspend fun saveAlbums(albums: List<Album>): List<Long> {
         return albumDao.insertAlbums(albums.map { it.toEntity() })
     }
 
