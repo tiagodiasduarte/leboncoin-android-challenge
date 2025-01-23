@@ -20,7 +20,7 @@ class ObserveAlbumsUseCaseTest {
     private val albumRepository = mockk<AlbumRepository>()
 
     @Test
-    fun whenAlbumsLoadSuccessfully_thenReturnAlbums() = runTest {
+    fun whenSuccessfully_thenReturnAlbums() = runTest {
         val expectedResult = albumsStub()
         coEvery { albumRepository.getAlbums(any()) } returns flowOf(PagingData.from(expectedResult))
 
