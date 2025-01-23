@@ -14,7 +14,7 @@ class FetchAlbumsUseCase(private val repository: AlbumRepository) {
             emit(repository.fetchAlbums())
 
         } catch (e: Exception) {
-            emit(Result.Error(ErrorEntity.Unknown(e.localizedMessage ?: "")))
+            emit(Result.Error(ErrorEntity.Unknown))
         }
     }
 

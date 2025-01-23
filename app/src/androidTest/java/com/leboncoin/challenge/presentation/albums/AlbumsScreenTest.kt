@@ -15,6 +15,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.leboncoin.challenge.R
 import com.leboncoin.challenge.data.albumsStub
 import com.leboncoin.challenge.domain.model.Album
+import com.leboncoin.challenge.presentation.UiText
 import com.leboncoin.challenge.util.TestTags
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -40,7 +41,7 @@ class AlbumsScreenTest {
     }
 
     @Test
-    fun whenRefreshLoadStateLoading_thenShowLoadingContent() {
+    fun albumsPaging_whenRefreshLoadStateLoading_thenShowLoadingContent() {
         setupAlbumsScreen()
 
         // Show loading content
@@ -49,7 +50,7 @@ class AlbumsScreenTest {
     }
 
     @Test
-    fun whenRefreshLoadStateNotLoading_withAlbums_thenShowAlbums() {
+    fun albumsPaging_whenRefreshLoadStateNotLoading_withAlbums_thenShowAlbums() {
         val sourceLoadStates = LoadStates(
             refresh = LoadState.NotLoading(false),
             prepend = LoadState.Loading,
@@ -70,7 +71,7 @@ class AlbumsScreenTest {
     }
 
     @Test
-    fun whenRefreshLoadStateNotLoading_withoutAlbums_thenShowEmptyAlbumsText() {
+    fun albumsPaging_whenRefreshLoadStateNotLoading_withoutAlbums_thenShowEmptyAlbumsText() {
         val sourceLoadStates = LoadStates(
             refresh = LoadState.NotLoading(false),
             prepend = LoadState.Loading,
@@ -90,13 +91,36 @@ class AlbumsScreenTest {
         composeRule.onNodeWithTag(TestTags.ALBUMS_SCREEN_PROGRESS_WHEEL).assertIsNotDisplayed()
     }
 
+    @Test
+    fun fetchList_whenError_thenShowDialogError() {
+        val dialogTitle = context.getString(R.string.albums_list_dialog_error_title)
+        val error = "Something went wrong"
+
+        val sourceLoadStates = LoadStates(
+            refresh = LoadState.NotLoading(false),
+            prepend = LoadState.Loading,
+            append = LoadState.Loading,
+        )
+        setupAlbumsScreen(
+            sourceLoadStates = sourceLoadStates,
+            errorMessage = error
+        )
+
+        // Show dialog
+        composeRule.onNodeWithText(dialogTitle).assertIsDisplayed()
+        composeRule.onNodeWithText(error).assertIsDisplayed()
+        composeRule.onNodeWithText(context.getString(R.string.albums_list_dialog_error_retry_button))
+            .assertIsDisplayed()
+    }
+
     private fun setupAlbumsScreen(
         albums: List<Album> = emptyList(),
         sourceLoadStates: LoadStates = LoadStates(
             refresh = LoadState.Loading,
             prepend = LoadState.Loading,
             append = LoadState.Loading,
-        )
+        ),
+        errorMessage: String? = null
     ) = runTest {
 
         val paging = PagingData.from(
@@ -106,7 +130,11 @@ class AlbumsScreenTest {
 
         composeRule.setContent {
             val lazyAlbumsPaging = flowOf(paging).collectAsLazyPagingItems()
-            AlbumsScreen(lazyAlbumsPaging)
+            AlbumsScreen(
+                albumsPaging = lazyAlbumsPaging,
+                onEventAction = { },
+                errorUiText =  errorMessage?.let { UiText.DynamicString(it) }
+            )
         }
     }
 

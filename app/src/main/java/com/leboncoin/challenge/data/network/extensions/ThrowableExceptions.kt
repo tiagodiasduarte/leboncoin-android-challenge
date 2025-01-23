@@ -6,7 +6,7 @@ import java.net.HttpURLConnection
 
 fun Throwable.toErrorEntity(): ErrorEntity = when (this) {
     is HttpException -> parseHttpError()
-    else -> ErrorEntity.Unknown(localizedMessage)
+    else -> ErrorEntity.Unknown
 }
 
 fun HttpException.parseHttpError(): ErrorEntity = when (code()) {

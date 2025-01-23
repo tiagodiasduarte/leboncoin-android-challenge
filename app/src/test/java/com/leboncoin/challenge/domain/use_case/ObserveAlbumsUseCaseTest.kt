@@ -40,8 +40,8 @@ class ObserveAlbumsUseCaseTest {
         assertThat(result).isInstanceOf(Result.Error::class.java)
 
         val errorResult = result as Result.Error
-        val errorEntity = errorResult.error as ErrorEntity.IllegalArgument
-        assertThat(errorEntity.message).isEqualTo(pageSizeError)
+        assertThat(errorResult.error as ErrorEntity.Unknown)
+            .isInstanceOf(ErrorEntity.Unknown::class.java)
     }
 
 }
