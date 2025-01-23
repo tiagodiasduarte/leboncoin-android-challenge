@@ -1,6 +1,7 @@
 package com.leboncoin.challenge.data.dao
 
 import android.content.Context
+import androidx.paging.PagingSource
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -8,7 +9,7 @@ import com.google.common.truth.Truth.assertThat
 import com.leboncoin.challenge.data.albumsEntityStub
 import com.leboncoin.challenge.data.db.AlbumDao
 import com.leboncoin.challenge.data.db.AlbumDatabase
-import kotlinx.coroutines.flow.first
+import com.leboncoin.challenge.util.PagingSourceTestHelper
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
@@ -42,17 +43,38 @@ class AlbumDaoTest {
         val expectedResult = albumsEntityStub()
         dao.insertAlbums(expectedResult)
 
-        val allAlbums = dao.getAlbums().first()
-        assertThat(allAlbums).isEqualTo(expectedResult)
+        val albums = dao.getAlbums()
+        assertThat(albums).isEqualTo(expectedResult)
+        assertThat(albums).hasSize(expectedResult.size)
     }
 
     @Test
     fun getAlbums() = runTest {
-        val expectedResult = albumsEntityStub()
+        val expectedResult = albumsEntityStub().take(10)
         dao.insertAlbums(expectedResult)
 
-        val allAlbums = dao.getAlbums().first()
+        val allAlbums = dao.getAlbums()
         assertThat(allAlbums).hasSize(expectedResult.size)
+    }
+
+    @Test
+    fun getPagedAlbums() = runTest {
+        val expectedResult = albumsEntityStub().take(10)
+
+        dao.insertAlbums(expectedResult)
+
+        val pagingSource = dao.getPagedAlbums()
+
+        val actual = PagingSourceTestHelper(pagingSource).load(
+            PagingSource.LoadParams.Refresh(
+                key = null,
+                loadSize = expectedResult.size,
+                placeholdersEnabled = false
+            )
+        )
+
+        val page = actual as PagingSource.LoadResult.Page
+        assertThat(page.data).isEqualTo(expectedResult)
     }
 
 }

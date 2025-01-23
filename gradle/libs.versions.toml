@@ -16,8 +16,9 @@ loggingInterceptor = "5.0.0-alpha.2"
 mockk = "1.13.13"
 mockwebserver = "4.12.0"
 kotlinGradlePlugin = "1.8.0"
+paging = "3.3.5"
 retrofit = "2.11.0"
-roomRuntime = "2.6.1"
+room = "2.6.1"
 truth = "1.4.4"
 turbine = "1.2.0"
 workRuntimeKtx = "2.10.0"
@@ -30,6 +31,10 @@ androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-co
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging" }
+androidx-paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "paging" }
+androidx-paging-testing = { module = "androidx.paging:paging-testing", version.ref = "paging" }
+androidx-room-paging = { module = "androidx.room:room-paging", version.ref = "room" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
@@ -37,9 +42,9 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
-androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomRuntime" }
-androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
-androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 androidx-hilt-common = { group = "androidx.hilt", name = "hilt-common", version.ref = "hilt" }
 androidx-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hilt" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt" }

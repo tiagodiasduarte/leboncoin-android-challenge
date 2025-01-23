@@ -6,11 +6,18 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.paging.LoadState
+import androidx.paging.LoadStates
+import androidx.paging.PagingData
+import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.leboncoin.challenge.R
 import com.leboncoin.challenge.data.albumsStub
+import com.leboncoin.challenge.domain.model.Album
 import com.leboncoin.challenge.util.TestTags
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,8 +31,8 @@ class AlbumsScreenTest {
     private val context: Context = ApplicationProvider.getApplicationContext()
 
     @Test
-    fun title_starting_isShown() {
-        setupAlbumsScreen(AlbumsUiState.Loading)
+    fun title_whenStarting_thenShowTitle() {
+        setupAlbumsScreen()
 
         // Show title text
         val expectedString = context.getString(R.string.albums_text)
@@ -33,8 +40,8 @@ class AlbumsScreenTest {
     }
 
     @Test
-    fun uiStateLoading_showLoadingContent() {
-        setupAlbumsScreen(AlbumsUiState.Loading)
+    fun whenRefreshLoadStateLoading_thenShowLoadingContent() {
+        setupAlbumsScreen()
 
         // Show loading content
         composeRule.onNodeWithTag(TestTags.ALBUMS_SCREEN_LOADING_CONTENT).assertIsDisplayed()
@@ -42,8 +49,17 @@ class AlbumsScreenTest {
     }
 
     @Test
-    fun uiStateSuccess_showAlbums() {
-        setupAlbumsScreen()
+    fun whenRefreshLoadStateNotLoading_withAlbums_thenShowAlbums() {
+        val sourceLoadStates = LoadStates(
+            refresh = LoadState.NotLoading(false),
+            prepend = LoadState.Loading,
+            append = LoadState.Loading,
+        )
+
+        setupAlbumsScreen(
+            albums = albumsStub(),
+            sourceLoadStates = sourceLoadStates
+        )
 
         // Show albums screen list
         composeRule.onNodeWithTag(TestTags.ALBUMS_SCREEN_LIST).assertIsDisplayed()
@@ -53,11 +69,44 @@ class AlbumsScreenTest {
         composeRule.onNodeWithTag(TestTags.ALBUMS_SCREEN_PROGRESS_WHEEL).assertIsNotDisplayed()
     }
 
+    @Test
+    fun whenRefreshLoadStateNotLoading_withoutAlbums_thenShowEmptyAlbumsText() {
+        val sourceLoadStates = LoadStates(
+            refresh = LoadState.NotLoading(false),
+            prepend = LoadState.Loading,
+            append = LoadState.Loading,
+        )
+
+        setupAlbumsScreen(sourceLoadStates = sourceLoadStates)
+
+        // Show empty list text
+        composeRule.onNodeWithTag(TestTags.ALBUMS_SCREEN_LIST_EMPTY_TEXT).assertIsDisplayed()
+
+        // Doesn't show screen list
+        composeRule.onNodeWithTag(TestTags.ALBUMS_SCREEN_LIST).assertIsNotDisplayed()
+
+        // Doesn't show loading content
+        composeRule.onNodeWithTag(TestTags.ALBUMS_SCREEN_LOADING_CONTENT).assertIsNotDisplayed()
+        composeRule.onNodeWithTag(TestTags.ALBUMS_SCREEN_PROGRESS_WHEEL).assertIsNotDisplayed()
+    }
+
     private fun setupAlbumsScreen(
-        uiState: AlbumsUiState = AlbumsUiState.Success(albumsStub())
-    ) {
+        albums: List<Album> = emptyList(),
+        sourceLoadStates: LoadStates = LoadStates(
+            refresh = LoadState.Loading,
+            prepend = LoadState.Loading,
+            append = LoadState.Loading,
+        )
+    ) = runTest {
+
+        val paging = PagingData.from(
+            data = albums,
+            sourceLoadStates = sourceLoadStates
+        )
+
         composeRule.setContent {
-            AlbumsScreen(uiState)
+            val lazyAlbumsPaging = flowOf(paging).collectAsLazyPagingItems()
+            AlbumsScreen(lazyAlbumsPaging)
         }
     }
 
