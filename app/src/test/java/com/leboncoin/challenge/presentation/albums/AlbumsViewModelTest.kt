@@ -4,8 +4,9 @@ import androidx.paging.PagingData
 import androidx.paging.testing.asSnapshot
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
-import com.leboncoin.challenge.data.albumsStub
 import com.leboncoin.challenge.core.Result
+import com.leboncoin.challenge.data.albumsStub
+import com.leboncoin.challenge.domain.error.ErrorEntity
 import com.leboncoin.challenge.domain.model.Album
 import com.leboncoin.challenge.domain.use_case.FetchAndSaveAlbumsUseCase
 import com.leboncoin.challenge.domain.use_case.ObserveAlbumsUseCase
@@ -28,7 +29,6 @@ class AlbumsViewModelTest {
     private val observeAlbumsUseCase = mockk<ObserveAlbumsUseCase>(relaxed = true)
     private val fetchAndSaveAlbumsUseCase = mockk<FetchAndSaveAlbumsUseCase>(relaxed = true)
 
-
     @Test
     fun observeAlbums_whenSuccess_thenReturnAlbums() = runTest {
         val expectedResult = albumsStub()
@@ -37,10 +37,7 @@ class AlbumsViewModelTest {
             emit(Result.Success(PagingData.from(expectedResult)))
         }
 
-        subject = AlbumsViewModel(
-            observeAlbumsUseCase = observeAlbumsUseCase,
-            fetchAndSaveAlbumsUseCase = fetchAndSaveAlbumsUseCase
-        )
+        setupViewModel()
 
         subject.albumsState.test {
             awaitItem()
@@ -54,6 +51,56 @@ class AlbumsViewModelTest {
         }
 
         verify { observeAlbumsUseCase(any()) }
+    }
+
+    @Test
+    fun fetchAlbums_whenSuccess_thenReturnTrue() = runTest {
+        val albums = albumsStub().take(20)
+        every { fetchAndSaveAlbumsUseCase() } returns flow {
+            emit(Result.Success(albums))
+        }
+
+        setupViewModel()
+
+        subject.albumsLoaded.test {
+            awaitItem()
+
+            assertThat(awaitItem()).isTrue()
+
+            assertThat(subject.errorUiText.value).isNull()
+
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify { fetchAndSaveAlbumsUseCase() }
+    }
+
+    @Test
+    fun fetchAlbums_whenError_thenReturnFalse() = runTest {
+        every { fetchAndSaveAlbumsUseCase() } returns flow {
+            emit(Result.Error(ErrorEntity.Unknown))
+        }
+
+        setupViewModel()
+
+        subject.albumsLoaded.test {
+            awaitItem()
+
+            assertThat(awaitItem()).isTrue()
+
+            assertThat(subject.errorUiText.value).isNotNull()
+
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        verify { fetchAndSaveAlbumsUseCase() }
+    }
+
+    private fun setupViewModel() {
+        subject = AlbumsViewModel(
+            observeAlbumsUseCase = observeAlbumsUseCase,
+            fetchAndSaveAlbumsUseCase = fetchAndSaveAlbumsUseCase
+        )
     }
 
 }

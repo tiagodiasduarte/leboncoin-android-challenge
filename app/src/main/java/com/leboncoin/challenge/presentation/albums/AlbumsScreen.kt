@@ -99,7 +99,7 @@ fun AlbumsScreen(
                 onDialogClosed = { onEventAction(AlbumsEvent.CloseDialog) },
                 onRetryClick = {
                     onEventAction(AlbumsEvent.CloseDialog)
-                    onEventAction(AlbumsEvent.Retry)
+                    onEventAction(AlbumsEvent.FetchAlbums)
                 }
             )
         }
