@@ -2,10 +2,13 @@
 
 package com.leboncoin.challenge.presentation.albums
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.leboncoin.challenge.presentation.UiText
+import com.leboncoin.challenge.presentation.asUiText
 import com.leboncoin.challenge.core.Result
 import com.leboncoin.challenge.domain.model.Album
 import com.leboncoin.challenge.domain.use_case.FetchAlbumsUseCase
@@ -20,6 +23,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 private const val PAGE_SIZE = 20
+private const val ALBUMS_VIEW_MODEL_TAG = "AlbumsViewModel"
 
 @HiltViewModel
 class AlbumsViewModel @Inject constructor(
@@ -27,12 +31,27 @@ class AlbumsViewModel @Inject constructor(
     private val fetchAlbumsUseCase: FetchAlbumsUseCase,
 ) : ViewModel() {
 
+    private val _errorUiText = MutableStateFlow<UiText?>(null)
+    val errorUiText = _errorUiText.asStateFlow()
+
     private val _albumsState = MutableStateFlow<PagingData<Album>>(PagingData.empty())
     val albumsState = _albumsState.asStateFlow()
 
     init {
         getAlbums()
         fetchAlbums()
+    }
+
+    fun onEvent(event: AlbumsEvent) {
+        when (event) {
+            AlbumsEvent.Retry -> {
+                fetchAlbums()
+            }
+
+            AlbumsEvent.CloseDialog -> {
+                _errorUiText.value = null
+            }
+        }
     }
 
     private fun getAlbums() {
@@ -61,11 +80,11 @@ class AlbumsViewModel @Inject constructor(
                 .collect { result ->
                     when (result) {
                         is Result.Error -> {
-                            Log.d("AlbumsViewModel","Something went wrong while loading the albums")
+                            _errorUiText.value = result.error.asUiText()
                         }
 
                         is Result.Success -> {
-                            Log.d("AlbumsViewModel","Albums loaded successfully!")
+                            Log.d(ALBUMS_VIEW_MODEL_TAG,"Albums loaded successfully!")
                         }
                     }
                 }

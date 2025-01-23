@@ -1,6 +1,22 @@
 <resources>
     <string name="app_name">Leboncoin</string>
+
+    <!-- Albums -->
     <string name="albums_text">Albums</string>
     <string name="albums_image_content_description">Albums</string>
     <string name="albums_list_empty_text">No albums available</string>
+    <string name="albums_list_dialog_error_title">Error</string>
+    <string name="albums_list_dialog_error_retry_button">Retry</string>
+    <string name="albums_list_loading_albums_error">Something went wrong while loading the albums. Please check your internet connection and try again.</string>
+
+    <!-- Errors -->
+    <string name="error_request_timed_out">The request timed out</string>
+    <string name="error_no_internet">Could\'t reach server. Check your internet connection.</string>
+    <string name="error_file_too_large">The file you tried to upload was too large.</string>
+    <string name="error_server_error">Oops, something went wrong. Please try again.</string>
+    <string name="error_unknown">An unknown error occurred</string>
+    <string name="error_disk_full">Failed to save the item because your device\'s disk is full</string>
+    <string name="error_serialization">Oops, could\'t parse data.</string>
+    <string name="error_access_denied">Access denied. You don’t have permission to perform this action.</string>
+    <string name="error_not_found">The requested resource could not be found.</string>
 </resources>

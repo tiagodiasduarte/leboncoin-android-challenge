@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class)
 
 package com.leboncoin.challenge.presentation.albums
 
@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -17,18 +19,21 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.LoadStates
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.leboncoin.challenge.R
+import com.leboncoin.challenge.presentation.UiText
 import com.leboncoin.challenge.domain.model.Album
 import com.leboncoin.challenge.ui.theme.DevicePreviews
 import com.leboncoin.challenge.ui.theme.Dimensions
@@ -42,14 +47,24 @@ import kotlinx.coroutines.flow.MutableStateFlow
 fun AlbumsRoute(
     viewModel: AlbumsViewModel = hiltViewModel()
 ) {
+    val errorUiText by viewModel.errorUiText.collectAsStateWithLifecycle()
+    val albumsPaging = viewModel.albumsState.collectAsLazyPagingItems()
 
-    val moviePagingItems = viewModel.albumsState.collectAsLazyPagingItems()
-
-    AlbumsScreen(moviePagingItems)
+    AlbumsScreen(
+        albumsPaging = albumsPaging,
+        onEventAction = {
+            viewModel.onEvent(it)
+        },
+        errorUiText = errorUiText
+    )
 }
 
 @Composable
-fun AlbumsScreen(albumsPaging: LazyPagingItems<Album>) {
+fun AlbumsScreen(
+    albumsPaging: LazyPagingItems<Album>,
+    onEventAction: (AlbumsEvent) -> Unit,
+    errorUiText: UiText? = null
+) {
 
     Scaffold(
         topBar = { AlbumsTopAppBar() },
@@ -76,6 +91,17 @@ fun AlbumsScreen(albumsPaging: LazyPagingItems<Album>) {
                     }
                 }
             }
+        }
+
+        if (errorUiText != null) {
+            AlertDialogError(
+                message = errorUiText.asString(),
+                onDialogClosed = { onEventAction(AlbumsEvent.CloseDialog) },
+                onRetryClick = {
+                    onEventAction(AlbumsEvent.CloseDialog)
+                    onEventAction(AlbumsEvent.Retry)
+                }
+            )
         }
     }
 }
@@ -106,19 +132,6 @@ fun AlbumListScreen(albumsPaging: LazyPagingItems<Album>) {
             AlbumItem(albumsPaging[index]!!)
         }
     }
-
-    albumsPaging.apply {
-        when {
-            loadState.refresh is LoadState.Loading -> {
-            }
-
-            loadState.refresh is LoadState.Error -> {
-            }
-
-            loadState.append is LoadState.Error -> {
-            }
-        }
-    }
 }
 
 @Composable
@@ -143,6 +156,27 @@ fun EmptyListContent(modifier: Modifier) {
     Text(
         modifier = modifier.testTag(ALBUMS_SCREEN_LIST_EMPTY_TEXT),
         text = stringResource(id = R.string.albums_list_empty_text)
+    )
+}
+
+@Composable
+fun AlertDialogError(message: String, onDialogClosed: () -> Unit, onRetryClick: () -> Unit) {
+    AlertDialog(
+        containerColor = Color.White,
+        onDismissRequest = { onDialogClosed.invoke() },
+        title = {
+            Text(stringResource(id = R.string.albums_list_dialog_error_title))
+        },
+        text = {
+            Text(message)
+        },
+        confirmButton = {
+            Button(
+                onClick = { onRetryClick.invoke() }
+            ) {
+                Text(stringResource(id = R.string.albums_list_dialog_error_retry_button))
+            }
+        },
     )
 }
 
@@ -174,7 +208,10 @@ fun AlbumsScreenPreview() {
     )
 
     val albumsPagingStateFlow = MutableStateFlow(PagingData.from(albums))
-    AlbumsScreen(albumsPagingStateFlow.collectAsLazyPagingItems())
+    AlbumsScreen(
+        albumsPaging = albumsPagingStateFlow.collectAsLazyPagingItems(),
+        onEventAction = {}
+    )
 }
 
 @DevicePreviews
@@ -188,7 +225,11 @@ fun AlbumsScreenLoadingPreview() {
             append = LoadState.Loading,
         )
     )
-    AlbumsScreen(MutableStateFlow(albumsPaging).collectAsLazyPagingItems())
+
+    AlbumsScreen(
+        albumsPaging = MutableStateFlow(albumsPaging).collectAsLazyPagingItems(),
+        onEventAction = {}
+    )
 }
 
 @DevicePreviews
@@ -202,6 +243,10 @@ fun AlbumsScreenErrorPreview() {
             append = LoadState.Loading,
         )
     )
-    AlbumsScreen(MutableStateFlow(albumsPaging).collectAsLazyPagingItems())
-}
 
+    AlbumsScreen(
+        albumsPaging = MutableStateFlow(albumsPaging).collectAsLazyPagingItems(),
+        onEventAction = {},
+        errorUiText = UiText.DynamicString("Something went wrong")
+    )
+}
