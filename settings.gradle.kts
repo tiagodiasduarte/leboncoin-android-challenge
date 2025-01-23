@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Challenge"
+rootProject.name = "Leboncoin"
 include(":app")
  
